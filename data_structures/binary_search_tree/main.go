@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type BinarySearchTree struct {
@@ -18,14 +19,13 @@ func New(value int) *BinarySearchTree {
 	return tree
 }
 
-func (tree *BinarySearchTree) Display(suffix string) {
-	fmt.Println(suffix, tree.value)
-	if tree.right != nil {
-		tree.right.Display("right")
+func (tree *BinarySearchTree) Display(level int) {
+	if tree == nil {
+		return
 	}
-	if tree.left != nil {
-		tree.left.Display("left")
-	}
+	tree.right.Display(level + 1)
+	fmt.Println(strings.Repeat("   ", level), tree.value)
+	tree.left.Display(level + 1)
 }
 
 func (tree *BinarySearchTree) Insert(value int) *BinarySearchTree {
@@ -111,12 +111,26 @@ func (tree *BinarySearchTree) FindMinNode() *BinarySearchTree {
 	return currentNode
 }
 
+func (tree *BinarySearchTree) Reverse() *BinarySearchTree {
+	if tree == nil {
+		return nil
+	}
+
+	temp := &BinarySearchTree{value: tree.value}
+	temp.right = tree.left.Reverse()
+	temp.left = tree.right.Reverse()
+
+	return temp
+}
+
 func main() {
 	tree := New(0)
-	tree = tree.Insert(1)
 	tree = tree.Insert(2)
-	tree = tree.Insert(-1)
+	tree = tree.Insert(1)
+	tree = tree.Insert(3)
 	tree = tree.Insert(-2)
+	tree = tree.Insert(-1)
+	tree = tree.Insert(-3)
 	tree = tree.Delete(1)
 	tree = tree.Delete(-2)
 	result, err := tree.Search(0)
@@ -128,5 +142,5 @@ func main() {
 
 	fmt.Println(result)
 	fmt.Println("------------")
-	tree.Display("root")
+	tree.Display(0)
 }
