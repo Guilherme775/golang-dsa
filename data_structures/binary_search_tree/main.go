@@ -28,52 +28,97 @@ func (tree *BinarySearchTree) Display(suffix string) {
 	}
 }
 
-func (tree *BinarySearchTree) Insert(value int) {
-	currentNode := tree
-
-	for currentNode != nil {
-		if value > currentNode.value {
-			if currentNode.right == nil {
-				currentNode.right = &BinarySearchTree{value: value}
-				break
-			} else {
-				currentNode = currentNode.right
-			}
-		} else if value < currentNode.value {
-			if currentNode.left == nil {
-				currentNode.left = &BinarySearchTree{value: value}
-				break
-			} else {
-				currentNode = currentNode.left
-			}
-		}
+func (tree *BinarySearchTree) Insert(value int) *BinarySearchTree {
+	if tree == nil {
+		return &BinarySearchTree{value: value}
 	}
+
+	if value > tree.value {
+		tree.right = tree.right.Insert(value)
+	} else if value < tree.value {
+		tree.left = tree.left.Insert(value)
+	}
+
+	return tree
 }
 
 func (tree *BinarySearchTree) Search(value int) (result int, err error) {
-	currentNode := tree
+	if tree == nil {
+		return 0, errors.New("cannot find value")
+	}
 
-	for currentNode != nil {
-		if currentNode.value == value {
-			return currentNode.value, nil
+	if tree.value == value {
+		return tree.value, nil
+	}
+
+	if value > tree.value {
+		return tree.right.Search(value)
+	}
+
+	if value < tree.value {
+		return tree.left.Search(value)
+	}
+
+	return 0, errors.New("cannot find value")
+}
+
+func (tree *BinarySearchTree) Delete(value int) *BinarySearchTree {
+	if tree == nil {
+		return nil
+	}
+
+	if value == tree.value {
+		if tree.right == nil && tree.left == nil {
+			return nil
 		}
 
-		if value > currentNode.value {
-			currentNode = currentNode.right
-		} else if value < currentNode.value {
-			currentNode = currentNode.left
+		if tree.right != nil && tree.left == nil {
+			return tree.right
+		}
+
+		if tree.right == nil && tree.left != nil {
+			return tree.left
+		}
+
+		if tree.right != nil && tree.left != nil {
+			minNode := tree.FindMinNode()
+			newTree := tree.Delete(minNode.value)
+
+			newTree.value = minNode.value
+
+			return newTree
 		}
 	}
 
-	return 0, errors.New("Cannot find value")
+	if value > tree.value {
+		tree.right = tree.right.Delete(value)
+	}
+
+	if value < tree.value {
+		tree.left = tree.left.Delete(value)
+	}
+
+	return tree
+}
+
+func (tree *BinarySearchTree) FindMinNode() *BinarySearchTree {
+	currentNode := tree
+
+	for currentNode.left != nil {
+		currentNode = currentNode.left
+	}
+
+	return currentNode
 }
 
 func main() {
 	tree := New(0)
-	tree.Insert(1)
-	tree.Insert(2)
-	tree.Insert(-1)
-	tree.Insert(-2)
+	tree = tree.Insert(1)
+	tree = tree.Insert(2)
+	tree = tree.Insert(-1)
+	tree = tree.Insert(-2)
+	tree = tree.Delete(1)
+	tree = tree.Delete(-2)
 	result, err := tree.Search(0)
 
 	if err != nil {
