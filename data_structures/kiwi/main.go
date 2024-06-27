@@ -37,7 +37,9 @@ func (kiwi *Kiwi[T]) Display() {
 func (kiwi *Kiwi[T]) Enqueue(value T) {
 	newNode := &Node[T]{value: value}
 
-	if kiwi.tail == nil {
+	if kiwi.head == nil {
+		kiwi.head = newNode
+	} else if kiwi.tail == nil {
 		kiwi.head.next = newNode
 		kiwi.tail = newNode
 	} else {

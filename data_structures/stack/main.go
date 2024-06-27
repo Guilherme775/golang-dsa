@@ -12,7 +12,6 @@ type Node[T any] struct {
 
 type Stack[T any] struct {
 	head   *Node[T]
-	tail   *Node[T]
 	length int
 }
 
@@ -35,15 +34,8 @@ func (stack *Stack[T]) Display() {
 }
 
 func (stack *Stack[T]) Push(value T) {
-	newNode := &Node[T]{value: value}
-
-	if stack.tail == nil {
-		stack.head.next = newNode
-		stack.tail = newNode
-	} else {
-		stack.tail.next = newNode
-		stack.tail = newNode
-	}
+	newNode := &Node[T]{value: value, next: stack.head}
+	stack.head = newNode
 
 	stack.length += 1
 }
